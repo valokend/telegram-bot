@@ -558,8 +558,6 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 
 
 def main():
-    # Create the Application and pass it your bot's token.
-    application = ApplicationBuilder().token(7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE).build()
 
     # Add your handlers.  Order matters!
     application.add_handler(CommandHandler("start", start))
