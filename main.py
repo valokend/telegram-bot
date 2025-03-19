@@ -18,8 +18,10 @@ logging.basicConfig(
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
 
-TELEGRAM_TOKEN = '7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE'
-WEATHER_API_KEY = '177a10354e99d3951963b89608edbe16'
+if not TELEGRAM_TOKEN:
+    TELEGRAM_TOKEN = '7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE'
+if not WEATHER_API_KEY:
+    WEATHER_API_KEY = '177a10354e99d3951963b89608edbe16'
 
 WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 FORECAST_API_URL = 'https://api.openweathermap.org/data/2.5/forecast'
@@ -323,6 +325,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     user_id = update.effective_user.id
+    
+    # Initialize user settings if not exists
+    if user_id not in user_settings:
+        user_settings[user_id] = {
+            'units': 'metric',
+            'wind_units': 'ms'
+        }
+    
     data = query.data.split('_')
     action = data[0]
 
@@ -559,19 +569,35 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 
     return result
 
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log the error and send a message to the developer."""
+    logging.error(f"Exception while handling an update: {context.error}")
+    
+    # Optional: notify yourself about errors
+    if update:
+        if isinstance(update, Update) and update.effective_message:
+            text = f"An error occurred: {context.error}"
+            await update.effective_message.reply_text("Sorry, something went wrong.")
 
 def main():
-    # Create an application instance first
+    # Make sure Telegram knows we're the only instance
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
-
+    
+    # Add a more robust way to handle simultaneous instances
+    # Set a higher allowed_updates timeout and add a dropout parameter
+    application.bot.get_updates(offset=-1, timeout=1)  # Clear any pending updates
+    
     # Add your handlers to the instance
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.LOCATION, handle_location))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_handler(CallbackQueryHandler(handle_callback))
+    
+    # Add error handler
+    application.add_error_handler(error_handler)
 
-    # Run the bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # Run the bot with appropriate parameters
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 if __name__ == '__main__':
     main()
