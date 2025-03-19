@@ -558,7 +558,6 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 
 
 def main():
-    """Start the bot."""
     # Create the Application and pass it your bot's token.
     application = ApplicationBuilder().token(7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE).build()
 
@@ -569,7 +568,6 @@ def main():
     application.add_handler(CallbackQueryHandler(handle_callback))
 
 
-    # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
