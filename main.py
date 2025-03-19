@@ -1,24 +1,23 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, KeyboardButton, ReplyKeyboardMarkup, \
     ReplyKeyboardRemove, WebAppInfo
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters, ApplicationBuilder
 import aiohttp
 from datetime import datetime
 import json
 import os
 from keep_alive import keep_alive
-keep_alive()
 
-bot = Bot(token=os.environ.get('token'))
-dp = Dispatcher(bot)
+keep_alive()
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.INFO
 )
 
-TELEGRAM_TOKEN = '7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE'  # Replace with your token
-WEATHER_API_KEY = '177a10354e99d3951963b89608edbe16'  # Replace with your API key
+TELEGRAM_TOKEN = os.environ.get('7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE')
+WEATHER_API_KEY = os.environ.get('177a10354e99d3951963b89608edbe16')
+
 WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 FORECAST_API_URL = 'https://api.openweathermap.org/data/2.5/forecast'
 GEOCODING_API_URL = 'http://api.openweathermap.org/geo/1.0/direct'
@@ -559,15 +558,19 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 
 
 def main():
-    application = Application.builder().token(TELEGRAM_TOKEN).build()
+    """Start the bot."""
+    # Create the Application and pass it your bot's token.
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
+    # Add your handlers.  Order matters!
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.LOCATION, handle_location))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_handler(CallbackQueryHandler(handle_callback))
 
-    application.run_polling()
 
+    # Run the bot until the user presses Ctrl-C
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
     main()
