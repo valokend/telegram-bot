@@ -560,7 +560,7 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 def main():
     """Start the bot."""
     # Create the Application and pass it your bot's token.
-    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
+    application = ApplicationBuilder().token(7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE).build()
 
     # Add your handlers.  Order matters!
     application.add_handler(CommandHandler("start", start))
