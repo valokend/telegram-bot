@@ -15,8 +15,11 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-TELEGRAM_TOKEN = os.environ.get('7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE')
-WEATHER_API_KEY = os.environ.get('177a10354e99d3951963b89608edbe16')
+TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
+WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
+
+TELEGRAM_TOKEN = '7646541759:AAFKfG_4K8KwaOIaWfG6qybPqcM_KmaG9UE'
+WEATHER_API_KEY = '177a10354e99d3951963b89608edbe16'
 
 WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 FORECAST_API_URL = 'https://api.openweathermap.org/data/2.5/forecast'
@@ -558,14 +561,16 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 
 
 def main():
+    # Create an application instance first
+    application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
 
-    # Add your handlers.  Order matters!
-    Application.add_handler(CommandHandler("start", start))
+    # Add your handlers to the instance
+    application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.LOCATION, handle_location))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_handler(CallbackQueryHandler(handle_callback))
 
-
+    # Run the bot
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == '__main__':
