@@ -5,6 +5,12 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 import aiohttp
 from datetime import datetime
 import json
+import os
+from keep_alive import keep_alive
+keep_alive()
+
+bot = Bot(token=os.environ.get('token'))
+dp = Dispatcher(bot)
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
