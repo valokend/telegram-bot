@@ -560,7 +560,7 @@ def format_forecast(forecast_data: dict, units: str, wind_units: str, user_id: i
 def main():
 
     # Add your handlers.  Order matters!
-    application.add_handler(CommandHandler("start", start))
+    Application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.LOCATION, handle_location))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     application.add_handler(CallbackQueryHandler(handle_callback))
