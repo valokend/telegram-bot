@@ -8,6 +8,13 @@ import json
 import os
 from keep_alive import keep_alive
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+    logging.info("Loaded .env file")
+except ImportError:
+    logging.info(".env file not found or python-dotenv not installed, relying on system environment variables.")
+
 keep_alive()
 
 logging.basicConfig(
@@ -19,9 +26,9 @@ TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN')
 WEATHER_API_KEY = os.environ.get('WEATHER_API_KEY')
 
 if not TELEGRAM_TOKEN:
-    TELEGRAM_TOKEN = '7646541759:AAG2lV6tyqsY2PrLvZTZMDlA0b6a-sReVgw'
+    logging.error("TELEGRAM_TOKEN environment variable not set!")
 if not WEATHER_API_KEY:
-    WEATHER_API_KEY = '177a10354e99d3951963b89608edbe16'
+    logging.error("WEATHER_API_KEY environment variable not set!")
 
 WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather'
 FORECAST_API_URL = 'https://api.openweathermap.org/data/2.5/forecast'
@@ -580,6 +587,10 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
             await update.effective_message.reply_text("Sorry, something went wrong.")
 
 def main():
+    if not TELEGRAM_TOKEN or not WEATHER_API_KEY:
+        logging.critical("CRITICAL: TELEGRAM_TOKEN or WEATHER_API_KEY is not set. Bot cannot start.")
+        return # Exit if tokens are not set
+        
     # Make sure Telegram knows we're the only instance
     application = ApplicationBuilder().token(TELEGRAM_TOKEN).build()
     
